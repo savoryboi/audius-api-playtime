@@ -11,6 +11,12 @@ export function TopTen() {
             console.log(top10)
         })
         .catch(error => console.log(error))
+    
+    const playTrack = async (id) => {
+        console.log(id)
+        const track = await new Audio(`https://audius-dp.amsterdam.creatorseed.com/v1/tracks/${id}/stream`);
+        track.play()
+    }
 
     return (
         <div className='top10'>
@@ -20,10 +26,7 @@ export function TopTen() {
                         <h2>{item.title}</h2>
                         <img src={item.artwork["150x150"]} alt={item.title + ' track artwork'}></img>
                         <h3>{item.genre}</h3>
-                        <button className='playBtn' onClick={function() {
-                            const track = new Audio(`https://audius-dp.amsterdam.creatorseed.com/v1/tracks/${item.id}/stream`);
-                            track.play()
-                        }}>
+                        <button className='playBtn' onClick={() => playTrack(item.id)} >
                             play track
                         </button>
                     </div>
