@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import Mp3 from './Mp3';
 
 export function TopTen() {
     const [top10, setTop10] = useState([]);
+    const [src, setSrc] = useState('');
+    const [streaming, setStreaming] = useState(false);
+
+  
 
     fetch('https://audius-dp.amsterdam.creatorseed.com/v1/tracks/trending')
         .then(res => res.json())
@@ -13,9 +16,28 @@ export function TopTen() {
         .catch(error => console.log(error))
     
     const playTrack = async (id) => {
-        console.log(id)
-        const track = await new Audio(`https://audius-dp.amsterdam.creatorseed.com/v1/tracks/${id}/stream`);
-        track.play()
+        const res = await fetch(`https://audius-metadata-3.figment.io/v1/tracks/${id}/stream?app_name=EXAMPLEAPP`,
+        {
+          method: 'GET'
+        
+        });
+        setSrc(res.url)
+        const audio = new Audio(src);
+
+        const state = {
+            audio: new Audio(src), 
+            isPlaying: false
+        }
+
+        if (streaming === false) {
+            state.audio.play()
+            setStreaming(true)
+        } else {
+            setStreaming(false)
+            state.audio.pause()
+            console.log('PAUSED')
+        }
+       
     }
 
     return (
@@ -26,9 +48,10 @@ export function TopTen() {
                         <h2>{item.title}</h2>
                         <img src={item.artwork["150x150"]} alt={item.title + ' track artwork'}></img>
                         <h3>{item.genre}</h3>
-                        <button className='playBtn' onClick={() => playTrack(item.id)} >
+                        <button className='playBtn' onClick={ () => playTrack(item.id)} >
                             play track
                         </button>
+    
                     </div>
                 )
             })}
