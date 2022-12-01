@@ -6,7 +6,7 @@ export function TopTen() {
     const [streaming, setStreaming] = useState(false);
 
   
-
+// get top10 data from audius api
     fetch('https://audius-dp.amsterdam.creatorseed.com/v1/tracks/trending')
         .then(res => res.json())
         .then(data => {
@@ -15,30 +15,41 @@ export function TopTen() {
         })
         .catch(error => console.log(error))
     
-    const playTrack = async (id) => {
+    const getTrack = async (id) => {
+        
+        //use id to fetch audio file from api 
+
         const res = await fetch(`https://audius-metadata-3.figment.io/v1/tracks/${id}/stream?app_name=EXAMPLEAPP`,
         {
           method: 'GET'
         
         });
+
+        // set source to the url from api response
         setSrc(res.url)
+
+        // create a new variable storing the audio element with specifed source from above
         const audio = new Audio(src);
 
-        const state = {
-            audio: new Audio(src), 
-            isPlaying: false
+        const playPauseTrack = () => {
+            if (streaming) {
+
+                setStreaming(false)
+                audio.pause()
+                console.log('paused')
+                
+            } else {
+                setStreaming(true)
+                audio.play()
+                console.log(`streaming`)
+            }
+            
         }
 
-        if (streaming === false) {
-            state.audio.play()
-            setStreaming(true)
-        } else {
-            setStreaming(false)
-            state.audio.pause()
-            console.log('PAUSED')
-        }
-       
+        return playPauseTrack();
+ 
     }
+
 
     return (
         <div className='top10'>
@@ -48,7 +59,7 @@ export function TopTen() {
                         <h2>{item.title}</h2>
                         <img src={item.artwork["150x150"]} alt={item.title + ' track artwork'}></img>
                         <h3>{item.genre}</h3>
-                        <button className='playBtn' onClick={ () => playTrack(item.id)} >
+                        <button className='playBtn' onClick={ () => getTrack(item.id) } >
                             play track
                         </button>
     
